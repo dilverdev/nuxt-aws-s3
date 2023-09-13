@@ -11,47 +11,34 @@ const {s3BucketName, s3Region} = runtimeConfig.public.aws
 const previewVisible = ref(false)
 const previewImage = ref('')
 const previewTitle = ref('')
-const fileList = ref<UploadProps['fileList']>([
-  {
-    uid: '-1',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-2',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-3',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-4',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-xxx',
-    percent: 50,
-    name: 'image.png',
-    status: 'uploading',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-5',
-    name: 'image.png',
-    status: 'error',
-  },
-])
+const fileList = ref<UploadProps['fileList']>([])
 
-const onImageUploaded = async (event) => {
-  const file = event.target.files[0]
+function getBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = error => reject(error)
+  });
+}
+
+const handleCancel = () => {
+  previewVisible.value = false
+  previewTitle.value = ''
+}
+
+const handlePreview = async (file: UploadProps['fileList'][number]) => {
+  if (!file.url && !file.preview) {
+    file.preview = (await getBase64(file.originFileObj)) as string
+  }
+  previewImage.value = file.url || file.preview
+  previewVisible.value = true;
+  previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1)
+}
+
+
+const onImageUploaded = async (file) => {
+  await console.log(file)
 
   const command = new PutObjectCommand({
     Bucket: s3BucketName,
@@ -68,39 +55,15 @@ const onImageUploaded = async (event) => {
     console.error(err)
   }
 
-  // Access link will be this one
   console.log(`https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${file.name}`)
 }
-
-function getBase64(file: File) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
-
-const handleCancel = () => {
-  previewVisible.value = false
-  previewTitle.value = ''
-}
-
-const handlePreview = async (file: UploadProps['fileList'][number]) => {
-  if (!file.url && !file.preview) {
-    file.preview = (await getBase64(file.originFileObj)) as string;
-  }
-  previewImage.value = file.url || file.preview;
-  previewVisible.value = true;
-  previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
-};
 </script>
 
 <template>
   <div class="clearfix">
     <a-upload
         v-model:file-list="fileList"
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+        :action="onImageUploaded"
         list-type="picture-card"
         @preview="handlePreview"
     >
