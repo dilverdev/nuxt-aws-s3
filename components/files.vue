@@ -1,11 +1,9 @@
 <script setup>
-const listObjects = useState('listObjects')
-
 const isOpenModalUpload = ref(false)
 </script>
 
 <template>
-  <div class="box-view p-10 bg-slate-100 space-y-6">
+  <div class="px-4 py-6 lg:px-5 box-view bg-slate-100 space-y-6">
     <div class="flex items-center justify-between">
       <h1 class="font-sans">Media Library</h1>
 
@@ -23,9 +21,8 @@ const isOpenModalUpload = ref(false)
       title="Add files"
       centered
       :footer="null"
-      @ok="isOpenModalUpload = false"
   >
-    <Upload class="py-4"/>
+    <Upload @finish="isOpenModalUpload = false" />
   </a-modal>
 </template>
 

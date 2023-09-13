@@ -1,0 +1,55 @@
+<script setup>
+import {DeleteObjectCommand} from "@aws-sdk/client-s3";
+import {Modal, message} from 'ant-design-vue';
+
+const runtimeConfig = useRuntimeConfig()
+const {$s3Client} = useNuxtApp()
+
+const {s3BucketName, s3Region} = runtimeConfig.public.aws
+
+const props = defineProps({
+  file: {
+    type: Object,
+    required: true
+  }
+})
+
+const emit = defineEmits(['delete'])
+
+const deleteObject = async () => {
+  const input = {
+    Bucket: s3BucketName,
+    Key: props.file.Key
+  }
+
+  const command = new DeleteObjectCommand(input)
+
+  try {
+    await $s3Client.send(command)
+    emit('delete', props.file.Key)
+  } catch (err) {
+    message.error('Error deleting file')
+  }
+}
+
+const showConfirm = () => {
+  Modal.confirm({
+    title: 'Are you sure to delete the file?',
+    okButtonProps: {
+      danger: true
+    },
+    okText: 'Delete',
+    async onOk() {
+      await deleteObject()
+    },
+  })
+}
+</script>
+
+<template>
+  <a-button @click="showConfirm" danger>
+    <template #icon>
+      <DeleteOutlined/>
+    </template>
+  </a-button>
+</template>

@@ -11,7 +11,7 @@ const listObjects = useState('listObjects', () => [])
 const params = ref({
   Bucket: s3BucketName,
   EncodingType: "url",
-  MaxKeys: 40,
+  MaxKeys: 24,
   Prefix: "",
 })
 const loadingPage = ref(false)
@@ -29,33 +29,48 @@ const fetchObjects = async () => {
   loadingPage.value = true
 
   const command = new ListObjectsV2Command(params.value)
-  const response = await $s3Client.send(command)
 
-  if (!response.IsTruncated && response.Contents.length) {
-    const files = response.Contents.map((item) => createObjectFile(item))
-    listObjects.value.push(...files)
+  try {
+    const response = await $s3Client.send(command)
+
+    if(response.Contents && response.Contents.length) {
+      if (!response.IsTruncated) {
+        const files = response.Contents.map((item) => createObjectFile(item))
+        listObjects.value.push(...files)
+        loadingPage.value = false
+        return
+      }
+
+      if (pageCounter.value !== page.value) {
+        pageCounter.value++
+        params.value.ContinuationToken = response.NextContinuationToken
+        await fetchObjects()
+        loadingPage.value = false
+        return
+      }
+
+      const files = response.Contents.map((item) => createObjectFile(item))
+      listObjects.value.push(...files)
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
     loadingPage.value = false
-    return
   }
-
-  if (pageCounter.value !== page.value) {
-    pageCounter.value++
-    params.value.ContinuationToken = response.NextContinuationToken
-    await fetchObjects()
-    loadingPage.value = false
-    return
-  }
-
-  const files = response.Contents.map((item) => createObjectFile(item))
-  listObjects.value.push(...files)
-
-  loadingPage.value = false
 }
 
 const nextPage = () => {
   if (loadingPage.value) return
 
   page.value++
+  fetchObjects()
+}
+
+const onSearch = () => {
+  listObjects.value = []
+  page.value = 0
+  pageCounter.value = 0
+  params.value.ContinuationToken = null
   fetchObjects()
 }
 
@@ -67,13 +82,13 @@ onMounted(async () => {
 <template>
   <div class="flex items-center justify-between">
     <div>
-      <a-button>
+      <a-button disabled>
         <FilterOutlined />Filter
       </a-button>
     </div>
 
     <div>
-      <a-input-search id="search" placeholder="Search" />
+      <a-input-search id="search" placeholder="Search" v-model:value="params.Prefix" @search="onSearch" />
     </div>
   </div>
 
