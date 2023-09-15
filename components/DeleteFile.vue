@@ -6,6 +6,7 @@ const runtimeConfig = useRuntimeConfig()
 const {$s3Client} = useNuxtApp()
 
 const {s3BucketName, s3Region} = runtimeConfig.public.aws
+const listObjects = useState('listObjects')
 
 const props = defineProps({
   file: {
@@ -15,6 +16,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['delete'])
+
+const removeFile = () => {
+  const index = listObjects.value.indexOf(props.file)
+  const newFileList = listObjects.value.slice()
+  newFileList.splice(index, 1)
+
+  listObjects.value = newFileList
+}
 
 const deleteObject = async () => {
   const input = {
@@ -27,6 +36,7 @@ const deleteObject = async () => {
   try {
     await $s3Client.send(command)
     emit('delete', props.file.Key)
+    removeFile()
   } catch (err) {
     message.error('Error deleting file')
   }

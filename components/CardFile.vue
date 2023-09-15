@@ -61,16 +61,6 @@ const downloadFile = () => {
           <LinkOutlined />
         </a>
       </a-tooltip>
-
-      <a-tooltip placement="top">
-        <template #title>
-          <span>Download</span>
-        </template>
-
-        <a :href="file.Url" :download="file.Key">
-          <DownloadOutlined />
-        </a>
-      </a-tooltip>
     </template>
 
     <div class="-m-2">
