@@ -9,14 +9,13 @@ const {s3BucketName, s3Region} = runtimeConfig.public.aws
 const emit = defineEmits(['finish'])
 
 const listObjects = useState('listObjects')
-
 const previewVisible = ref(false)
 const uploading = ref(false)
 const files = ref([])
 const previewImage = ref('')
 const previewTitle = ref('')
 
-function getBase64(file) {
+const getBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -39,6 +38,13 @@ const handleCancel = () => {
   previewTitle.value = ''
 }
 
+const createName = (name) => {
+  const fileExtension = name.split('.').pop()
+  const cleanedFileName = name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9.-]/g, '_')
+  const timestamp = new Date().getTime()
+  return `${cleanedFileName}_${timestamp}.${fileExtension}`
+}
+
 const beforeUpload = (file) => {
   return false
 }
@@ -52,9 +58,11 @@ const handleRemove = (file) => {
 }
 
 const onImageUploaded = async (file) => {
+  const name = createName(file.name)
+
   const command = new PutObjectCommand({
     Bucket: s3BucketName,
-    Key: file.name,
+    Key: name,
     Body: file,
     CacheControl: 'max-age=31536000',
     ACL: 'public-read',
@@ -64,10 +72,10 @@ const onImageUploaded = async (file) => {
     await $s3Client.send(command)
 
     const newObject = {
-      Key: file.name,
+      Key: name,
       LastModified: new Date(),
       Size: file.size,
-      Url: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${file.name}`
+      Url: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${name}`
     }
 
     listObjects.value.unshift(newObject)
@@ -98,9 +106,8 @@ const submitFiles = async () => {
           @remove="handleRemove"
           @preview="handlePreview"
       >
-
         <p class="ant-upload-drag-icon">
-          <inbox-outlined></inbox-outlined>
+          <InboxOutlined />
         </p>
 
         <p class="ant-upload-text">Click or drag file to this area to upload</p>
@@ -108,7 +115,6 @@ const submitFiles = async () => {
         <p class="ant-upload-hint">
           Support for a single or bulk upload
         </p>
-
       </a-upload-dragger>
 
     <div class="flex justify-end mt-5">
