@@ -1,6 +1,6 @@
 <script setup>
 import {PutObjectCommand} from '@aws-sdk/client-s3'
-import {message} from "ant-design-vue";
+import {message} from "ant-design-vue"
 
 const runtimeConfig = useRuntimeConfig()
 const {$s3Client} = useNuxtApp()

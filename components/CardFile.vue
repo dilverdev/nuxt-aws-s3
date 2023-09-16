@@ -1,5 +1,4 @@
 <script setup>
-import DeleteFile from "~/components/DeleteFile.vue";
 import {message} from 'ant-design-vue';
 
 const runtimeConfig = useRuntimeConfig()
@@ -14,6 +13,20 @@ const props = defineProps({
   }
 })
 
+const listSelectedObjects= useState('selectedObjects')
+const isSelectedCard = computed(() => listSelectedObjects.value.includes(props.file))
+
+const selectedCard = (val) => {
+  if(val.target.checked) {
+    listSelectedObjects.value.push(props.file)
+  } else {
+    const index = listSelectedObjects.value.indexOf(props.file)
+    const newFileList = listSelectedObjects.value.slice()
+    newFileList.splice(index, 1)
+    listSelectedObjects.value = newFileList
+  }
+}
+
 const copyUrl = () => {
   const url = `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${props.file.Key}`
   navigator.clipboard.writeText(url)
@@ -22,8 +35,12 @@ const copyUrl = () => {
 </script>
 
 <template>
-  <a-card size="small" class="card-preview h-full flex flex-col relative group">
-    <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100">
+  <a-card size="small" class="card-file h-full flex flex-col relative group" hoverable :class="{ active: isSelectedCard}">
+    <div class="absolute top-3 left-3 transform scale-75" :class="{ 'opacity-0 group-hover:opacity-100': !isSelectedCard}">
+      <a-checkbox :checked="isSelectedCard" @change="selectedCard" />
+    </div>
+
+    <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100" v-if="!isSelectedCard">
       <DeleteFile :file="file"/>
     </div>
 
@@ -77,7 +94,26 @@ const copyUrl = () => {
   border-radius: 0;
 }
 
-.card-preview .ant-card-body {
+.card-file {
+  box-shadow: 0 0 0 2px transparent;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.card-file .ant-card-body {
   height: 100%;
+}
+
+.card-file.active {
+  box-shadow: 0 0 0 2px #1777ff;
+}
+
+.card-file :where(.css-dev-only-do-not-override-kqecok).ant-checkbox .ant-checkbox-inner {
+  width: 24px;
+  height: 24px;
+}
+
+.card-file :where(.css-dev-only-do-not-override-kqecok).ant-checkbox-checked .ant-checkbox-inner:after {
+  inset-inline-start: 31.5%;
 }
 </style>

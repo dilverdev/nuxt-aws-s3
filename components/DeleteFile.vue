@@ -57,9 +57,9 @@ const showConfirm = () => {
 </script>
 
 <template>
-  <a-button @click="showConfirm" danger>
+  <a-button @click="showConfirm" danger size="small" >
     <template #icon>
-      <DeleteOutlined/>
+      <DeleteOutlined :style="{ fontSize: '13px' }" />
     </template>
   </a-button>
 </template>

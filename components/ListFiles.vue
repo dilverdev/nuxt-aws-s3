@@ -93,11 +93,13 @@ onMounted(async () => {
     </li>
   </ul>
 
-  <div v-if="loadingPage" class="text-center">
+  <div v-if="!loadingPage" class="text-center py-10">
     <a-spin/>
   </div>
 
   <Observer @intersect="nextPage"/>
+
+  <MultipleActions />
 </template>
 
 
