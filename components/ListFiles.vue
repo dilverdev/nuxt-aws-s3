@@ -80,21 +80,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-between">
-    <div>
-      <a-button disabled>
-        <FilterOutlined />Filter
-      </a-button>
-    </div>
-
-    <div>
-      <a-input-search id="search" placeholder="Search" v-model:value="params.Prefix" @search="onSearch" />
+  <div class="flex items-center justify-center my-14">
+    <div class="w-full max-w-xl transform scale-75">
+      <a-input-search id="search" placeholder="Search"  class="search-files" size="large" v-model:value="params.Prefix"
+                      @search="onSearch"/>
     </div>
   </div>
 
-  <ul class="list-none m-0 p-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+  <ul class="list-none m-0 p-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 relative z-0">
     <li v-for="file in listObjects" :key="file.Key">
-      <CardFile :file="file" />
+      <CardFile :file="file"/>
     </li>
   </ul>
 
@@ -105,13 +100,17 @@ onMounted(async () => {
   <Observer @intersect="nextPage"/>
 </template>
 
+
 <style>
-.box-preview {
-  height: 12rem;
-  background: repeating-conic-gradient(rgb(246, 246, 249) 0%, rgb(246, 246, 249) 25%, transparent 0%, transparent 50%) 50% center / 20px 20px;
+.search-files .ant-input {
+  border-radius: 1000px;
+  padding: 8px 18px;
 }
 
-.card-preview .ant-card-body {
+.search-files >.ant-input-group >.ant-input-group-addon:last-child .ant-input-search-button {
+  border-radius: 0 1000px 1000px 0;
+  width: 50px;
   height: 100%;
+  padding: 7px 12px;
 }
 </style>

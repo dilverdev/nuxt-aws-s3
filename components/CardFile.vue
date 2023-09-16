@@ -19,25 +19,23 @@ const copyUrl = () => {
   navigator.clipboard.writeText(url)
   message.success('Copied to clipboard')
 }
-
-const downloadFile = () => {
-  // code download file
-}
 </script>
 
 <template>
-  <a-card class="card-preview h-full flex flex-col relative group">
+  <a-card size="small" class="card-preview h-full flex flex-col relative group">
     <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100">
       <DeleteFile :file="file"/>
     </div>
 
     <template #cover>
-      <div class="box-preview flex justify-center items-center w-full p-2">
-        <img
-            alt="example"
-            :src="file.Url"
-            class="object-contain w-full h-full"
-        />
+      <div>
+        <div class="box-preview flex justify-center items-center w-full p-2">
+          <img
+              alt="example"
+              :src="file.Url"
+              class="object-contain max-w-full max-h-full"
+          />
+        </div>
       </div>
     </template>
 
@@ -63,8 +61,23 @@ const downloadFile = () => {
       </a-tooltip>
     </template>
 
-    <div class="-m-2">
+    <div>
       <h3 class="text-xs break-all w-full">{{ file.Key }}</h3>
     </div>
   </a-card>
 </template>
+
+<style>
+.box-preview {
+  height: 12rem;
+  background: repeating-conic-gradient(rgb(246, 246, 249) 0%, rgb(246, 246, 249) 25%, transparent 0%, transparent 50%) 50% center / 20px 20px;
+}
+
+:where(.css-dev-only-do-not-override-kqecok).ant-card .ant-card-cover img {
+  border-radius: 0;
+}
+
+.card-preview .ant-card-body {
+  height: 100%;
+}
+</style>
