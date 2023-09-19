@@ -13,7 +13,8 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   modules: [
-    '@ant-design-vue/nuxt'
+    '@ant-design-vue/nuxt',
+    '@vueuse/nuxt',
   ],
   css: ['~/assets/css/main.css'],
   postcss: {

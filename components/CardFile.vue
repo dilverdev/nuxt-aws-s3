@@ -1,6 +1,8 @@
 <script setup>
 import {message} from 'ant-design-vue';
+import { useClipboard } from '@vueuse/core'
 
+const { copy, copied } = useClipboard()
 const runtimeConfig = useRuntimeConfig()
 const {$s3Client} = useNuxtApp()
 
@@ -27,10 +29,14 @@ const selectedCard = (val) => {
   }
 }
 
-const copyUrl = () => {
+const copyUrl = async () => {
   const url = `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${props.file.Key}`
-  navigator.clipboard.writeText(url)
-  message.success('Copied to clipboard')
+
+  await copy(url)
+
+  if(copied) {
+    message.success('Copied to clipboard')
+  }
 }
 </script>
 
