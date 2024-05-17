@@ -65,6 +65,7 @@ const onImageUploaded = async (file) => {
     Key: name,
     Body: file,
     CacheControl: 'max-age=31536000',
+    ContentType: file.type,
     ACL: 'public-read',
   })
 
