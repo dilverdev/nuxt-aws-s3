@@ -3,10 +3,6 @@ import {message} from 'ant-design-vue';
 import { useClipboard } from '@vueuse/core'
 
 const { copy, copied } = useClipboard()
-const runtimeConfig = useRuntimeConfig()
-const {$s3Client} = useNuxtApp()
-
-const {s3BucketName, s3Region} = runtimeConfig.public.aws
 
 const props = defineProps({
   file: {
@@ -29,9 +25,7 @@ const selectedCard = (val) => {
   }
 }
 
-const copyUrl = async () => {
-  const url = `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${props.file.Key}`
-
+const copyUrl = async (url) => {
   await copy(url)
 
   if(copied) {
@@ -68,7 +62,7 @@ const copyUrl = async () => {
           <span>Copy url</span>
         </template>
 
-        <a :href="file.Url" @click.prevent="copyUrl">
+        <a :href="file.Url" @click.prevent="copyUrl(file.Url)">
           <CopyOutlined/>
         </a>
       </a-tooltip>

@@ -5,7 +5,7 @@ import {message} from "ant-design-vue"
 const runtimeConfig = useRuntimeConfig()
 const {$s3Client} = useNuxtApp()
 
-const {s3BucketName, s3Region} = runtimeConfig.public.aws
+const {s3BucketName, s3Region, s3CdnUrl} = runtimeConfig.public.aws
 const emit = defineEmits(['finish'])
 
 const listObjects = useState('listObjects')
@@ -76,7 +76,7 @@ const onImageUploaded = async (file) => {
       Key: name,
       LastModified: new Date(),
       Size: file.size,
-      Url: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${name}`
+      Url: s3CdnUrl ? `${s3CdnUrl}/${name}` : `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${name}`
     }
 
     listObjects.value.unshift(newObject)

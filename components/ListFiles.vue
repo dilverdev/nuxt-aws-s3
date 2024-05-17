@@ -5,7 +5,7 @@ import CardFile from "~/components/CardFile.vue";
 const runtimeConfig = useRuntimeConfig()
 const {$s3Client} = useNuxtApp()
 
-const {s3BucketName, s3Region} = runtimeConfig.public.aws
+const {s3BucketName, s3Region, s3CdnUrl} = runtimeConfig.public.aws
 const listObjects = useState('listObjects', () => [])
 
 const params = ref({
@@ -22,7 +22,7 @@ const createObjectFile = (item) => ({
   Key: item.Key,
   LastModified: item.LastModified,
   Size: item.Size,
-  Url: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${item.Key}`
+  Url: s3CdnUrl ? `${s3CdnUrl}/${item.Key}` : `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/${item.Key}`
 })
 
 const fetchObjects = async () => {

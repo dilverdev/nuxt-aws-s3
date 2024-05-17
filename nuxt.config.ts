@@ -8,6 +8,7 @@ export default defineNuxtConfig({
         iamUserAccessId: process.env.NUXT_IAM_USER_ACCESS_ID,
         s3BucketName: process.env.NUXT_S3_BUCKET_NAME,
         s3Region: process.env.NUXT_S3_REGION,
+        s3CdnUrl: process.env.NUXT_S3_CDN_URL,
       }
     }
   },
